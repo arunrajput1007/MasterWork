@@ -1,0 +1,84 @@
+{
+  "documentation": "Movie Table",
+  "fields": [
+    {
+      "documentation": "Movie Id",
+      "name": "movie_no",
+      "type": "Integer",
+      "nullable" : false
+    },
+    {
+      "documentation": "Movie Title",
+      "name": "title",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Poster",
+      "name": "poster_path_url",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Poster local path",
+      "name":"poster_path_local",
+      "type": "String",
+      "nullable": true
+    },
+    {
+      "documentation": "Movie Overview",
+      "name": "overview",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Release Date",
+      "name": "release_date",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Is Adult or not",
+      "name": "adult",
+      "type": "Boolean",
+      "nullable": false,
+      "defaultValue":"0"
+    },
+    {
+      "documentation": "Movie Ratings",
+      "name": "vote_average",
+      "type": "Float",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie vote count",
+      "name": "vote_count",
+      "type": "Integer",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Popularity",
+      "name": "popularity",
+      "type": "Float",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Back Image Url",
+      "name": "backdrop_path_url",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Back Image Local path",
+      "name": "backdrop_path_local",
+      "type": "String",
+      "nullable": true
+    },
+    {
+      "documentation": "Movie Category",
+      "name": "category",
+      "type": "String",
+      "nullable": false
+    }
+  ]
+}
