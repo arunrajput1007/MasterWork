@@ -1,13 +1,13 @@
 {
-	"syntaxVersion": "3",
-	"projectPackageId": "com.example.arun.masterwork",
-	"authority": "com.example.arun.masterwork.provider",
-	"providerJavaPackage":"com.example.arun.masterwork.provider",
-	"providerClassName": "MovieProvider",
-	"sqliteOpenHelperClassName": "MovieSQLiteOpenHelper",
-	"sqliteOpenHelperCallbacksClassName": "MovieSQLiteOpenHelperCallbacks",
-	"databaseFileName": "Mmdb.db",
-	"databaseVersion": 1,
-	"enableForeignKeys": true,
-	"useAnnotations": true
+  "syntaxVersion": "3",
+  "projectPackageId": "com.example.arun.masterwork",
+  "authority": "com.example.arun.masterwork.provider",
+  "providerJavaPackage": "com.example.arun.masterwork.provider",
+  "providerClassName": "MovieProvider",
+  "sqliteOpenHelperClassName": "MovieSQLiteOpenHelper",
+  "sqliteOpenHelperCallbacksClassName": "MovieSQLiteOpenHelperCallbacks",
+  "databaseFileName": "Mydb.db",
+  "databaseVersion": 1,
+  "enableForeignKeys": true,
+  "useAnnotations": true
 }

@@ -8,16 +8,29 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 /**
- * Created by arun on 30/1/16.
+ * Created by arun on 29/6/16.
  */
+
 public class TrailerSet implements Parcelable {
+
+    static Creator<TrailerSet> CREATOR = new Creator<TrailerSet>() {
+        @Override
+        public TrailerSet createFromParcel(Parcel source) {
+            return new TrailerSet(source);
+        }
+
+        @Override
+        public TrailerSet[] newArray(int size) {
+            return new TrailerSet[size];
+        }
+    };
 
     @SerializedName("id")
     private int movieId;
     @SerializedName("results")
     private ArrayList<Trailer> trailerList;
 
-    public TrailerSet(Parcel in) {
+    private TrailerSet(Parcel in) {
         movieId = in.readInt();
         trailerList = in.createTypedArrayList(Trailer.CREATOR);
     }
@@ -32,18 +45,6 @@ public class TrailerSet implements Parcelable {
         dest.writeInt(movieId);
         dest.writeTypedList(trailerList);
     }
-
-    public static Creator<TrailerSet> CREATOR = new Creator<TrailerSet>() {
-        @Override
-        public TrailerSet createFromParcel(Parcel source) {
-            return new TrailerSet(source);
-        }
-
-        @Override
-        public TrailerSet[] newArray(int size) {
-            return new TrailerSet[size];
-        }
-    };
 
     public int getMovieId() {
         return movieId;

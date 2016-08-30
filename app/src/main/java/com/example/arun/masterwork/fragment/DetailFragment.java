@@ -1,138 +1,135 @@
 package com.example.arun.masterwork.fragment;
 
-import android.app.Activity;
+
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.arun.masterwork.DBHandler.DbManager;
 import com.example.arun.masterwork.R;
+import com.example.arun.masterwork.activity.MainActivity;
+import com.example.arun.masterwork.adapter.DetailRecyclerAdapter;
 import com.example.arun.masterwork.adapter.Utility;
-import com.example.arun.masterwork.asynctask.PaletteImageViewLoader;
-import com.example.arun.masterwork.constants.IMAGECONSTANT;
-import com.example.arun.masterwork.constants.MOVIECONSTANT;
-import com.example.arun.masterwork.models.Movie;
-import com.example.arun.masterwork.network.NetworkManager;
-import com.squareup.picasso.Picasso;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
+import com.example.arun.masterwork.provider.movie.MovieCursor;
+import com.example.arun.masterwork.provider.movie.MovieSelection;
+import com.example.arun.masterwork.provider.review.ReviewColumns;
+import com.example.arun.masterwork.provider.review.ReviewCursor;
+import com.example.arun.masterwork.provider.trailer.TrailerColumns;
+import com.example.arun.masterwork.provider.trailer.TrailerCursor;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Created by arun on 2/7/16.
  */
-public class DetailFragment extends Fragment {
 
-    @Bind(R.id.poster_image)
-    ImageView posterImage;
-    @Bind(R.id.release_date_tv)
-    TextView releaseDate;
-    @Bind(R.id.rating_tv)
-    TextView rating;
-    @Bind(R.id.synopsis)
-    TextView synopsis;
-    @Bind(R.id.tablet_detail)
-    LinearLayout tabletLinearLayout;
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private FloatingActionButton favButton = null;
-    private ImageView backImage = null;
-    private TextView title_label = null;
-
-    private String TAG = "DetailFragment";
-    private Context mContext = null;
-    private Activity activity = null;
-    private Movie movie = null;
-    private NetworkManager networkManager = null;
+    private Integer movieDbId = 0;
     private boolean mTwoPane;
-
-    public DetailFragment() {
-    }
+    private MovieCursor movieCursor = null;
+    private Context mContext = null;
+    private DetailRecyclerAdapter adapter = null;
+    private TrailerCursor trailerCursor = null;
+    private ReviewCursor reviewCursor = null;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getContext();
 
-        if(getArguments().containsKey("movie")){
-            movie = (Movie) getArguments().get("movie");
-            activity = this.getActivity();
-            mContext = activity;
-
-            networkManager = new NetworkManager(activity);
-            networkManager.fetchMovieReviews(movie.getId());
-            networkManager.fetchMovieTrailer(movie.getId());
+        if (getArguments().containsKey("movie_db_id")) {
+            movieDbId = (Integer) getArguments().get("movie_db_id");
         }
-
-        if(activity.findViewById(R.id.collapsing_toolbar)==null)
-            mTwoPane=true;
+        if (getActivity() instanceof MainActivity)
+            mTwoPane = true;
+        movieCursor = new MovieSelection().id(movieDbId).query(mContext.getContentResolver());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.movie_detail, container, false);
-        ButterKnife.bind(this, view);
-
-        Picasso.with(mContext).load(IMAGECONSTANT.IMAGE_BASE_URL_POSTER_IMAGE + movie.getImagePath()).into(posterImage);
-        releaseDate.setText("Release Date :" + movie.getReleaseDate());
-        rating.setText("Ratings :" + movie.getRating());
-        synopsis.setText(movie.getDescription());
-        favButton = (FloatingActionButton) activity.findViewById(R.id.fab);
-
-        if(!mTwoPane){
-            backImage = (ImageView) activity.findViewById(R.id.back_image);
-            title_label = (TextView)activity.findViewById(R.id.title_label);
-            tabletLinearLayout.setVisibility(View.GONE);
-        }
-        else{
-            backImage = (ImageView) view.findViewById(R.id.back_image_tablet);
-            title_label = (TextView) view.findViewById(R.id.title_label_tablet);
-        }
-
-        if(movie.getBackImageLocalPath()!=null){
-            Utility utility = new Utility(mContext);
-            Bitmap b= utility.getImageBitmap(movie.getBackImageLocalPath());
-            backImage.setImageBitmap(b);
-            posterImage.setImageBitmap(utility.getImageBitmap(movie.getPosterLocalPath()));
-            title_label.setBackgroundColor(Utility.getTitleBarColor(b));
-        }
-        else
-        new PaletteImageViewLoader(mContext,backImage,title_label).execute(IMAGECONSTANT.IMAGE_BASE_URL_BACK_IMAGE+movie.getBackImage());
-
-        title_label.setText(movie.getTitle());
-
-        favButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DbManager dbManager = new DbManager(mContext);
-                int i=dbManager.addMovieToDb(movie, MOVIECONSTANT.MOVIE_CATEGORY_FAVORITE_DB);
-                if(i==-1)
-                    Toast.makeText(mContext,"already exist",Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(mContext,"inserted into db :"+i,Toast.LENGTH_SHORT).show();
+        if (movieCursor.moveToFirst()) {
+            if (mTwoPane) {
+                FrameLayout tabletFrame = (FrameLayout) view.findViewById(R.id.tablet_frame);
+                View collapseView = inflater.inflate(R.layout.detail_collapse, tabletFrame, true);
+                ImageView backimage = (ImageView) collapseView.findViewById(R.id.back_image);
+                Bitmap backBitmap = Utility.getImageBitmap(movieCursor.getBackdropPathLocal(), mContext);
+                backimage.setImageBitmap(backBitmap);
+                TextView titleTv = (TextView) collapseView.findViewById(R.id.title_label);
+                titleTv.setText(movieCursor.getTitle());
+                titleTv.setBackgroundColor(Utility.getTitleBarColor(backBitmap));
             }
-        });
+            ImageView posterImage = (ImageView) view.findViewById(R.id.poster_image);
+            posterImage.setImageBitmap(Utility.getImageBitmap(movieCursor.getPosterPathLocal(), mContext));
+            TextView releaseDate = (TextView) view.findViewById(R.id.release_date_tv);
+            releaseDate.setText(movieCursor.getReleaseDate());
+            TextView rating = (TextView) view.findViewById(R.id.rating_tv);
+            rating.setText(Float.valueOf(movieCursor.getVoteAverage()).toString());
+            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.detail_dynamic_list);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(layoutManager);
+            adapter = new DetailRecyclerAdapter(mContext);
+            adapter.setDescription(movieCursor.getOverview());
+            recyclerView.setAdapter(adapter);
+        }
+
+        getActivity().getSupportLoaderManager().initLoader(0, null, this);
+        getActivity().getSupportLoaderManager().initLoader(1, null, this);
         return view;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (id == 0)
+            return new CursorLoader(getContext(), TrailerColumns.CONTENT_URI, TrailerColumns.ALL_COLUMNS
+                    , TrailerColumns.MOVIE_ID + "=?", new String[]{movieDbId.toString()}, null);
+        if (id == 1)
+            return new CursorLoader(getContext(), ReviewColumns.CONTENT_URI, ReviewColumns.ALL_COLUMNS
+                    , ReviewColumns.MOVIE_ID + "=?", new String[]{movieDbId.toString()}, null);
+        else
+            return null;
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
+    public void onLoaderReset(Loader<Cursor> loader) {
+        /*if(loader.getId() == 0)
+            adapter.setTrailerCursor(null);
+        if(loader.getId() == 1)
+            adapter.setReviewCursor(null);*/
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        int id = loader.getId();
+        if (id == 0 && cursor.moveToFirst()) {
+            trailerCursor = new TrailerCursor(cursor);
+            adapter.setTrailerCursor(trailerCursor);
+        }
+        if (id == 1 && cursor.moveToFirst()) {
+            reviewCursor = new ReviewCursor(cursor);
+            adapter.setReviewCursor(reviewCursor);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (trailerCursor != null)
+            trailerCursor.close();
+        if (reviewCursor != null)
+            reviewCursor.close();
     }
 }

@@ -11,22 +11,18 @@ import android.util.Log;
 
 import com.example.arun.masterwork.BuildConfig;
 import com.example.arun.masterwork.provider.movie.MovieColumns;
+import com.example.arun.masterwork.provider.review.ReviewColumns;
+import com.example.arun.masterwork.provider.trailer.TrailerColumns;
 
 public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
-    private static final String TAG = MovieSQLiteOpenHelper.class.getSimpleName();
-
-    public static final String DATABASE_FILE_NAME = "Mmdb.db";
-    private static final int DATABASE_VERSION = 1;
-    private static MovieSQLiteOpenHelper sInstance;
-    private final Context mContext;
-    private final MovieSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
-
+    public static final String DATABASE_FILE_NAME = "Mydb.db";
     // @formatter:off
     public static final String SQL_CREATE_TABLE_MOVIE = "CREATE TABLE IF NOT EXISTS "
             + MovieColumns.TABLE_NAME + " ( "
             + MovieColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + MovieColumns.MOVIE_NO + " INTEGER NOT NULL, "
             + MovieColumns.TITLE + " TEXT NOT NULL, "
+            + MovieColumns.CATEGORY + " TEXT NOT NULL, "
             + MovieColumns.POSTER_PATH_URL + " TEXT NOT NULL, "
             + MovieColumns.POSTER_PATH_LOCAL + " TEXT, "
             + MovieColumns.OVERVIEW + " TEXT NOT NULL, "
@@ -36,11 +32,47 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
             + MovieColumns.VOTE_COUNT + " INTEGER NOT NULL, "
             + MovieColumns.POPULARITY + " REAL NOT NULL, "
             + MovieColumns.BACKDROP_PATH_URL + " TEXT NOT NULL, "
-            + MovieColumns.BACKDROP_PATH_LOCAL + " TEXT, "
-            + MovieColumns.CATEGORY + " TEXT NOT NULL "
+            + MovieColumns.BACKDROP_PATH_LOCAL + " TEXT "
+            + ", CONSTRAINT unique_constraint UNIQUE (movie_no) ON CONFLICT REPLACE"
             + " );";
+    public static final String SQL_CREATE_TABLE_REVIEW = "CREATE TABLE IF NOT EXISTS "
+            + ReviewColumns.TABLE_NAME + " ( "
+            + ReviewColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + ReviewColumns.MOVIE_ID + " INTEGER NOT NULL, "
+            + ReviewColumns.AUTHOR + " TEXT NOT NULL, "
+            + ReviewColumns.COMMENTS + " TEXT NOT NULL "
+            + ", CONSTRAINT fk_movie_id FOREIGN KEY (" + ReviewColumns.MOVIE_ID + ") REFERENCES movie (_id) ON DELETE RESTRICT"
+            + " );";
+    public static final String SQL_CREATE_TABLE_TRAILER = "CREATE TABLE IF NOT EXISTS "
+            + TrailerColumns.TABLE_NAME + " ( "
+            + TrailerColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + TrailerColumns.MOVIE_ID + " INTEGER NOT NULL, "
+            + TrailerColumns.KEY + " TEXT NOT NULL, "
+            + TrailerColumns.NAME + " TEXT NOT NULL, "
+            + TrailerColumns.TYPE + " TEXT NOT NULL "
+            + ", CONSTRAINT fk_movie_id FOREIGN KEY (" + TrailerColumns.MOVIE_ID + ") REFERENCES movie (_id) ON DELETE RESTRICT"
+            + ", CONSTRAINT unique_constraint UNIQUE (key) ON CONFLICT REPLACE"
+            + " );";
+    private static final String TAG = MovieSQLiteOpenHelper.class.getSimpleName();
+    private static final int DATABASE_VERSION = 1;
+    private static MovieSQLiteOpenHelper sInstance;
+    private final Context mContext;
+    private final MovieSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
 
     // @formatter:on
+
+    private MovieSQLiteOpenHelper(Context context) {
+        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION);
+        mContext = context;
+        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private MovieSQLiteOpenHelper(Context context, DatabaseErrorHandler errorHandler) {
+        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION, errorHandler);
+        mContext = context;
+        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
+    }
 
     public static MovieSQLiteOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -59,20 +91,12 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
         return newInstancePostHoneycomb(context);
     }
 
-
     /*
      * Pre Honeycomb.
      */
     private static MovieSQLiteOpenHelper newInstancePreHoneycomb(Context context) {
         return new MovieSQLiteOpenHelper(context);
     }
-
-    private MovieSQLiteOpenHelper(Context context) {
-        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION);
-        mContext = context;
-        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
-    }
-
 
     /*
      * Post Honeycomb.
@@ -82,19 +106,13 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
         return new MovieSQLiteOpenHelper(context, new DefaultDatabaseErrorHandler());
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private MovieSQLiteOpenHelper(Context context, DatabaseErrorHandler errorHandler) {
-        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION, errorHandler);
-        mContext = context;
-        mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();
-    }
-
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         if (BuildConfig.DEBUG) Log.d(TAG, "onCreate");
         mOpenHelperCallbacks.onPreCreate(mContext, db);
         db.execSQL(SQL_CREATE_TABLE_MOVIE);
+        db.execSQL(SQL_CREATE_TABLE_REVIEW);
+        db.execSQL(SQL_CREATE_TABLE_TRAILER);
         mOpenHelperCallbacks.onPostCreate(mContext, db);
     }
 

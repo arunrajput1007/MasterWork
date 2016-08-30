@@ -47,6 +47,18 @@ public class MovieCursor extends AbstractCursor implements MovieModel {
     }
 
     /**
+     * Category
+     * Cannot be {@code null}.
+     */
+    @NonNull
+    public String getCategory() {
+        String res = getStringOrNull(MovieColumns.CATEGORY);
+        if (res == null)
+            throw new NullPointerException("The value of 'category' in the database was null, which is not allowed according to the model definition");
+        return res;
+    }
+
+    /**
      * Movie Poster
      * Cannot be {@code null}.
      */
@@ -151,18 +163,6 @@ public class MovieCursor extends AbstractCursor implements MovieModel {
     @Nullable
     public String getBackdropPathLocal() {
         String res = getStringOrNull(MovieColumns.BACKDROP_PATH_LOCAL);
-        return res;
-    }
-
-    /**
-     * Movie Category
-     * Cannot be {@code null}.
-     */
-    @NonNull
-    public String getCategory() {
-        String res = getStringOrNull(MovieColumns.CATEGORY);
-        if (res == null)
-            throw new NullPointerException("The value of 'category' in the database was null, which is not allowed according to the model definition");
         return res;
     }
 }

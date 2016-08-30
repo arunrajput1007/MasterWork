@@ -12,24 +12,35 @@ import java.util.ArrayList;
  */
 public class MovieSet implements Parcelable {
 
+    public static Creator<MovieSet> CREATOR = new Creator<MovieSet>() {
+        @Override
+        public MovieSet createFromParcel(Parcel source) {
+            return new MovieSet(source);
+        }
+
+        @Override
+        public MovieSet[] newArray(int size) {
+            return new MovieSet[size];
+        }
+    };
+
     @SerializedName("page")
     private int currentPage;
+
     @SerializedName("results")
     private ArrayList<Movie> movieList;
+
     @SerializedName("total_results")
     private int totalResults;
+
     @SerializedName("total_pages")
     private int totalPages;
 
-    public MovieSet(int currentPage) {
-        this.currentPage = currentPage;
-    }
-
-    public MovieSet(Parcel in) {
+    private MovieSet(Parcel in) {
         currentPage = in.readInt();
         movieList = in.createTypedArrayList(Movie.CREATOR);
         totalResults = in.readInt();
-        currentPage = in.readInt();
+        totalPages = in.readInt();
     }
 
     @Override
@@ -44,18 +55,6 @@ public class MovieSet implements Parcelable {
         dest.writeInt(totalResults);
         dest.writeInt(totalPages);
     }
-
-    public static Creator<MovieSet> CREATOR = new Creator<MovieSet>() {
-        @Override
-        public MovieSet createFromParcel(Parcel source) {
-            return new MovieSet(source);
-        }
-
-        @Override
-        public MovieSet[] newArray(int size) {
-            return new MovieSet[size];
-        }
-    };
 
     public int getCurrentPage() {
         return currentPage;

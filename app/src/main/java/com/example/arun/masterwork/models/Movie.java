@@ -6,9 +6,22 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by arun on 19/12/15.
+ * Created by arun on 29/6/16.
  */
-public class Movie implements Parcelable {
+public class Movie implements Parcelable, Databasable {
+
+    static final Creator<Movie> CREATOR = new Creator<Movie>() {
+
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     @SerializedName("id")
     private int id;
@@ -30,14 +43,14 @@ public class Movie implements Parcelable {
     private float popularity;
     @SerializedName("backdrop_path")
     private String backImage;
-
+    private String category;
     private String posterLocalPath;
     private String backImageLocalPath;
 
     public Movie() {
     }
 
-    public Movie(Parcel in) {
+    private Movie(Parcel in) {
         id = in.readInt();
         imagePath = in.readString();
         title = in.readString();
@@ -73,111 +86,107 @@ public class Movie implements Parcelable {
         dest.writeString(backImageLocalPath);
     }
 
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel source) {
-            return new Movie(source);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
-
     public int getId() {
         return id;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getReleaseDate() {
-        return releaseDate;
-    }
-
-    public boolean isAdult() {
-        return adult;
-    }
-
-    public float getRating() {
-        return rating;
-    }
-
-    public int getVoteCount() {
-        return voteCount;
-    }
-
-    public float getPopularity() {
-        return popularity;
-    }
-
-    public String getBackImage() {
-        return backImage;
-    }
-
-    public String getPosterLocalPath() {
-        return posterLocalPath;
-    }
-
-    public String getBackImageLocalPath() {
-        return backImageLocalPath;
-    }
-
-    public void setPosterLocalPath(String posterLocalPath) {
-        this.posterLocalPath = posterLocalPath;
-    }
-
-    public void setBackImageLocalPath(String backImageLocalPath) {
-        this.backImageLocalPath = backImageLocalPath;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isAdult() {
+        return adult;
     }
 
     public void setAdult(boolean adult) {
         this.adult = adult;
     }
 
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public float getRating() {
+        return rating;
     }
 
     public void setRating(float rating) {
         this.rating = rating;
     }
 
+    public int getVoteCount() {
+        return voteCount;
+    }
+
     public void setVoteCount(int voteCount) {
         this.voteCount = voteCount;
+    }
+
+    public float getPopularity() {
+        return popularity;
     }
 
     public void setPopularity(float popularity) {
         this.popularity = popularity;
     }
 
+    public String getBackImage() {
+        return backImage;
+    }
+
     public void setBackImage(String backImage) {
         this.backImage = backImage;
+    }
+
+    public String getPosterLocalPath() {
+        return posterLocalPath;
+    }
+
+    public void setPosterLocalPath(String posterLocalPath) {
+        this.posterLocalPath = posterLocalPath;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getBackImageLocalPath() {
+        return backImageLocalPath;
+    }
+
+    public void setBackImageLocalPath(String backImageLocalPath) {
+        this.backImageLocalPath = backImageLocalPath;
     }
 }

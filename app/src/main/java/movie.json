@@ -1,15 +1,21 @@
 {
-  "documentation": "Movie Table",
+  "documentation": "Movie Table containing movie related data",
   "fields": [
     {
       "documentation": "Movie Id",
       "name": "movie_no",
       "type": "Integer",
-      "nullable" : false
+      "nullable": false
     },
     {
       "documentation": "Movie Title",
       "name": "title",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Category",
+      "name": "category",
       "type": "String",
       "nullable": false
     },
@@ -21,7 +27,7 @@
     },
     {
       "documentation": "Movie Poster local path",
-      "name":"poster_path_local",
+      "name": "poster_path_local",
       "type": "String",
       "nullable": true
     },
@@ -42,7 +48,7 @@
       "name": "adult",
       "type": "Boolean",
       "nullable": false,
-      "defaultValue":"0"
+      "defaultValue": "0"
     },
     {
       "documentation": "Movie Ratings",
@@ -73,12 +79,12 @@
       "name": "backdrop_path_local",
       "type": "String",
       "nullable": true
-    },
+    }
+  ],
+  "constraints": [
     {
-      "documentation": "Movie Category",
-      "name": "category",
-      "type": "String",
-      "nullable": false
+      "name": "unique_constraint",
+      "definition": "UNIQUE (movie_no) ON CONFLICT REPLACE"
     }
   ]
 }

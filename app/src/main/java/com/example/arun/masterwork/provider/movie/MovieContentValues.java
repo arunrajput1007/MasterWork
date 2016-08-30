@@ -57,6 +57,16 @@ public class MovieContentValues extends AbstractContentValues {
 
 
     /**
+     * Category
+     */
+    public MovieContentValues putCategory(@NonNull String value) {
+        if (value == null) throw new IllegalArgumentException("category must not be null");
+        mContentValues.put(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+
+    /**
      * Movie Poster
      */
     public MovieContentValues putPosterPathUrl(@NonNull String value) {
@@ -157,14 +167,4 @@ public class MovieContentValues extends AbstractContentValues {
         mContentValues.putNull(MovieColumns.BACKDROP_PATH_LOCAL);
         return this;
     }
-
-    /**
-     * Movie Category
-     */
-    public MovieContentValues putCategory(@NonNull String value) {
-        if (value == null) throw new IllegalArgumentException("category must not be null");
-        mContentValues.put(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
 }

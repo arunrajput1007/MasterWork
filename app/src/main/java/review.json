@@ -1,0 +1,27 @@
+{
+  "documentation": "Table containing movie review data",
+  "fields": [
+    {
+      "documentation": "Movie Sqlite Id",
+      "name": "movie_id",
+      "type": "Integer",
+      "nullable": false,
+      "foreignKey": {
+        "table": "movie",
+        "onDelete": "RESTRICT"
+      }
+    },
+    {
+      "documentation": "Movie Author",
+      "name": "author",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Comment",
+      "name": "comments",
+      "type": "String",
+      "nullable": false
+    }
+  ]
+}

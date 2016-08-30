@@ -6,9 +6,22 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by arun on 30/1/16.
+ * Created by arun on 29/6/16.
  */
-public class Trailer implements Parcelable {
+
+public class Trailer implements Parcelable, Databasable {
+
+    static Creator<Trailer> CREATOR = new Creator<Trailer>() {
+        @Override
+        public Trailer createFromParcel(Parcel source) {
+            return new Trailer(source);
+        }
+
+        @Override
+        public Trailer[] newArray(int size) {
+            return new Trailer[size];
+        }
+    };
 
     @SerializedName("key")
     private String key;
@@ -17,7 +30,7 @@ public class Trailer implements Parcelable {
     @SerializedName("type")
     private String type;
 
-    public Trailer(Parcel in) {
+    private Trailer(Parcel in) {
         key = in.readString();
         videoName = in.readString();
         type = in.readString();
@@ -34,18 +47,6 @@ public class Trailer implements Parcelable {
         dest.writeString(videoName);
         dest.writeString(type);
     }
-
-    public static Creator<Trailer> CREATOR = new Creator<Trailer>() {
-        @Override
-        public Trailer createFromParcel(Parcel source) {
-            return new Trailer(source);
-        }
-
-        @Override
-        public Trailer[] newArray(int size) {
-            return new Trailer[size];
-        }
-    };
 
     public String getKey() {
         return key;

@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
 import com.example.arun.masterwork.provider.MovieProvider;
 
 /**
- * Movie Table
+ * Movie Table containing movie related data
  */
 public class MovieColumns implements BaseColumns {
     public static final String TABLE_NAME = "movie";
@@ -26,6 +26,11 @@ public class MovieColumns implements BaseColumns {
      * Movie Title
      */
     public static final String TITLE = "title";
+
+    /**
+     * Category
+     */
+    public static final String CATEGORY = "category";
 
     /**
      * Movie Poster
@@ -77,11 +82,6 @@ public class MovieColumns implements BaseColumns {
      */
     public static final String BACKDROP_PATH_LOCAL = "backdrop_path_local";
 
-    /**
-     * Movie Category
-     */
-    public static final String CATEGORY = "category";
-
 
     public static final String DEFAULT_ORDER = TABLE_NAME + "." +_ID;
 
@@ -90,6 +90,7 @@ public class MovieColumns implements BaseColumns {
             _ID,
             MOVIE_NO,
             TITLE,
+            CATEGORY,
             POSTER_PATH_URL,
             POSTER_PATH_LOCAL,
             OVERVIEW,
@@ -99,8 +100,7 @@ public class MovieColumns implements BaseColumns {
             VOTE_COUNT,
             POPULARITY,
             BACKDROP_PATH_URL,
-            BACKDROP_PATH_LOCAL,
-            CATEGORY
+            BACKDROP_PATH_LOCAL
     };
     // @formatter:on
 
@@ -109,6 +109,7 @@ public class MovieColumns implements BaseColumns {
         for (String c : projection) {
             if (c.equals(MOVIE_NO) || c.contains("." + MOVIE_NO)) return true;
             if (c.equals(TITLE) || c.contains("." + TITLE)) return true;
+            if (c.equals(CATEGORY) || c.contains("." + CATEGORY)) return true;
             if (c.equals(POSTER_PATH_URL) || c.contains("." + POSTER_PATH_URL)) return true;
             if (c.equals(POSTER_PATH_LOCAL) || c.contains("." + POSTER_PATH_LOCAL)) return true;
             if (c.equals(OVERVIEW) || c.contains("." + OVERVIEW)) return true;
@@ -119,7 +120,6 @@ public class MovieColumns implements BaseColumns {
             if (c.equals(POPULARITY) || c.contains("." + POPULARITY)) return true;
             if (c.equals(BACKDROP_PATH_URL) || c.contains("." + BACKDROP_PATH_URL)) return true;
             if (c.equals(BACKDROP_PATH_LOCAL) || c.contains("." + BACKDROP_PATH_LOCAL)) return true;
-            if (c.equals(CATEGORY) || c.contains("." + CATEGORY)) return true;
         }
         return false;
     }

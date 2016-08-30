@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:ignore="MergeRootFrame"
-    tools:context=".activity.DetailActivity">
+    tools:context=".activity.DetailActivity"
+    tools:ignore="MergeRootFrame">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -24,7 +24,9 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:titleEnabled="false">
 
-            <LinearLayout
+            <include layout="@layout/detail_collapse" />
+
+            <!--<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
@@ -43,12 +45,12 @@
                     style="@style/TextAppearance.AppCompat.Title"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
+                    android:gravity="center_vertical"
                     android:paddingLeft="16dp"
-                    android:gravity="center_vertical" />
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
 
-            </LinearLayout>
+            </LinearLayout>-->
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -65,7 +67,7 @@
         android:id="@+id/movie_detail_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -73,6 +75,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"/>
+        android:src="@drawable/ic_favorite_border" />
 
 </android.support.design.widget.CoordinatorLayout>

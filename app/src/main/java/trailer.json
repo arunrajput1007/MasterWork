@@ -1,0 +1,39 @@
+{
+  "documentation": "Table containing movie trailer data",
+  "fields": [
+    {
+      "documentation": "Movie Table _id",
+      "name": "movie_id",
+      "type": "Integer",
+      "nullable": false,
+      "foreignKey": {
+        "table": "movie",
+        "onDelete": "RESTRICT"
+      }
+    },
+    {
+      "documentation": "Movie Trailer Key",
+      "name": "key",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Trailer Name",
+      "name": "name",
+      "type": "String",
+      "nullable": false
+    },
+    {
+      "documentation": "Movie Trailer Type",
+      "name": "type",
+      "type": "String",
+      "nullable": false
+    }
+  ],
+  "constraints": [
+    {
+      "name": "unique_constraint",
+      "definition": "UNIQUE (key) ON CONFLICT REPLACE"
+    }
+  ]
+}

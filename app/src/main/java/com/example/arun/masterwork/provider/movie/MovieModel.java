@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import com.example.arun.masterwork.provider.base.BaseModel;
 
 /**
- * Movie Table
+ * Movie Table containing movie related data
  */
 public interface MovieModel extends BaseModel {
 
@@ -21,6 +21,13 @@ public interface MovieModel extends BaseModel {
      */
     @NonNull
     String getTitle();
+
+    /**
+     * Category
+     * Cannot be {@code null}.
+     */
+    @NonNull
+    String getCategory();
 
     /**
      * Movie Poster
@@ -83,11 +90,4 @@ public interface MovieModel extends BaseModel {
      */
     @Nullable
     String getBackdropPathLocal();
-
-    /**
-     * Movie Category
-     * Cannot be {@code null}.
-     */
-    @NonNull
-    String getCategory();
 }

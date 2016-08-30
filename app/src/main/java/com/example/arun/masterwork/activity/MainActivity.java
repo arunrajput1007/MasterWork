@@ -1,41 +1,93 @@
 package com.example.arun.masterwork.activity;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SyncStatusObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.example.arun.masterwork.R;
-import com.example.arun.masterwork.adapter.MovieGridAdapter;
-import com.example.arun.masterwork.adapter.Utility;
-import com.example.arun.masterwork.constants.MOVIECONSTANT;
-import com.example.arun.masterwork.fragment.DetailFragment;
-import com.example.arun.masterwork.models.Movie;
-import com.example.arun.masterwork.network.NetworkManager;
+import com.example.arun.masterwork.adapter.MainRecyclerAdapter;
+import com.example.arun.masterwork.constants.MovieConstant;
+import com.example.arun.masterwork.loaders.MovieLoader;
+import com.example.arun.masterwork.provider.MovieProvider;
 import com.example.arun.masterwork.provider.movie.MovieColumns;
+import com.example.arun.masterwork.service.MovieNetworkService;
 
-import java.util.ArrayList;
-
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @Bind(R.id.gridview)
-    GridView movieGridView;
-    private NetworkManager networkManager = null;
-    private MovieGridAdapter movieGridAdapter = null;
-    private boolean mTwoPane;
+    public static final String AUTHORITY = MovieProvider.AUTHORITY;
+    public static final long SECONDS_PER_MINUTE = 60L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 60L;
+    public static final long SYNC_INTERVAL = 60L;
+    private static final String ACCOUNT = "dummyaccount";
+    private static final String ACCOUNT_TYPE = "example.com";
+    static Account mAccount;
+    @BindView(R.id.recycler_gridview)
+    RecyclerView movieRecyclerView;
+    private MainRecyclerAdapter adapter = null;
     private boolean favMenuButtonClick;
+    private Unbinder unbinder = null;
+    private SyncStatusObserver mSyncStatusObserver = new SyncStatusObserver() {
+        /** Callback invoked with the sync adapter status changes. */
+        @Override
+        public void onStatusChanged(int which) {
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Account account = mAccount;
+                    boolean syncActive = ContentResolver.isSyncActive(
+                            account, AUTHORITY);
+                    boolean syncPending = ContentResolver.isSyncPending(
+                            account, AUTHORITY);
+                    boolean refresh = syncActive || syncPending;
+                    Bundle settingsBundle = new Bundle();
+                    settingsBundle.putBoolean(
+                            ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                    settingsBundle.putBoolean(
+                            ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                    getContentResolver().startSync(MovieColumns.CONTENT_URI, settingsBundle);
+                }
+            });
+        }
+    };
+
+    public static void createSyncAccount(Context context) {
+        mAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        Account[] accounts = accountManager.getAccounts();
+        if (accountManager.addAccountExplicitly(mAccount, null, null)) {
+            Log.e("AccountManager", "account is added");
+            ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+            ContentResolver.addPeriodicSync(mAccount, AUTHORITY, Bundle.EMPTY, SYNC_INTERVAL);
+        } else {
+            for (Account account : accounts) {
+                if (mAccount.equals(account))
+                    Log.e("AccountManager", "account already exists");
+                else
+                    Log.e("AccountManager", "Account manager error");
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,39 +95,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
 
-        movieGridAdapter = new MovieGridAdapter(this);
-        movieGridView.setAdapter(movieGridAdapter);
-        networkManager = new NetworkManager(this);
+        checkIfFirstRun();
+        createSyncAccount(this);
 
-        //By Default Popular Movies are fetched and showed in GridAdapter
-        networkManager.fetchMovies(MOVIECONSTANT.POPULAR_MOVIES_URL,movieGridAdapter);
+        movieRecyclerView = (RecyclerView) findViewById(R.id.recycler_gridview);
+        movieRecyclerView.setHasFixedSize(true);
+        GridLayoutManager manager = new GridLayoutManager(this, 2);
+        movieRecyclerView.setLayoutManager(manager);
+        adapter = new MainRecyclerAdapter(this, null);
+        movieRecyclerView.setAdapter(adapter);
+        getSupportLoaderManager().initLoader(0, null, this);
+    }
 
-        if(findViewById(R.id.movie_detail_container)!=null){
-            mTwoPane = true;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSyncStatusObserver.onStatusChanged(0);
+        final int mask = ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE;
+        ContentResolver.addStatusChangeListener(mask, mSyncStatusObserver);
+    }
+
+    private void checkIfFirstRun() {
+        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        if (!sharedPreferences.getBoolean("notfirst", false)) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("notfirst", true);
+            editor.apply();
+            Intent intent = new Intent(this, MovieNetworkService.class);
+            intent.putExtra(MovieConstant.INTENT_DIFFERENTIATOR, MovieConstant.MOVIE_CATEGORY_POPULAR);
+            startService(intent);
         }
-
-        movieGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movie = (Movie) parent.getAdapter().getItem(position);
-                if (mTwoPane) {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("movie",movie);
-                    DetailFragment fragment = new DetailFragment();
-                    fragment.setArguments(bundle);
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.movie_detail_container, fragment)
-                            .commit();
-                } else {
-                    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                    intent.putExtra("movie",movie);
-                    startActivity(intent);
-                }
-            }
-        });
-        getSupportLoaderManager().initLoader(0,null,this);
     }
 
     @Override
@@ -93,7 +144,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 item.setChecked(false);
             else {
                 item.setChecked(true);
-                networkManager.fetchMovies(MOVIECONSTANT.POPULAR_MOVIES_URL, movieGridAdapter);
+                Intent intent = new Intent(this, MovieNetworkService.class);
+                intent.putExtra(MovieConstant.INTENT_DIFFERENTIATOR, MovieConstant.MOVIE_CATEGORY_POPULAR);
+                startService(intent);
+                getSupportLoaderManager().restartLoader(1, null, this);
             }
         }
         if (id == R.id.menu_top_rated_movies) {
@@ -101,7 +155,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 item.setChecked(false);
             else {
                 item.setChecked(true);
-                networkManager.fetchMovies(MOVIECONSTANT.TOP_RATED_MOVIES_URL, movieGridAdapter);
+                Intent intent = new Intent(this, MovieNetworkService.class);
+                intent.putExtra(MovieConstant.INTENT_DIFFERENTIATOR, MovieConstant.MOVIE_CATEGORY_TOP_RATED);
+                startService(intent);
+                getSupportLoaderManager().restartLoader(1, null, this);
             }
         }
         if (id == R.id.menu_favorites) {
@@ -109,13 +166,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 item.setChecked(false);
             else {
                 item.setChecked(true);
-                getSupportLoaderManager().restartLoader(1,null,this);
+                getSupportLoaderManager().restartLoader(1, null, new MovieLoader(this));
             }
         }
-        if(id==R.id.menu_item_share){
+        if (id == R.id.menu_item_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, "www.youtube.com/watch?v="+ Utility.getFirstTrailer());
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "www.youtube.com/watch?v=" /*+ new Utility(this).getFirstTrailer()*/);
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         }
@@ -124,30 +181,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(id==1)
-            favMenuButtonClick =true;
-        return new CursorLoader(this,MovieColumns.CONTENT_URI,null,null,null,null);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
+        if (id == 0)
+            return new CursorLoader(this, MovieColumns.CONTENT_URI, new String[]{MovieColumns._ID, MovieColumns.POSTER_PATH_LOCAL}
+                    , MovieColumns.CATEGORY + "= ? ", new String[]{MovieConstant.MOVIE_CATEGORY_POPULAR}, null);
+        if (id == 1)
+            return new CursorLoader(this, MovieColumns.CONTENT_URI, new String[]{MovieColumns._ID, MovieColumns.POSTER_PATH_LOCAL}
+                    , MovieColumns.CATEGORY + "= ? ", new String[]{MovieConstant.MOVIE_CATEGORY_TOP_RATED}, null);
+        if (id == 2)
+            return new CursorLoader(this, MovieColumns.CONTENT_URI, new String[]{MovieColumns._ID, MovieColumns.POSTER_PATH_LOCAL}
+                    , MovieColumns.CATEGORY + "= ? ", new String[]{MovieConstant.MOVIE_CATEGORY_FAVORITE}, null);
+        return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if(favMenuButtonClick){
-                Utility utility = new Utility();
-                ArrayList<Movie> movieList=utility.getMovieListFromCursor(cursor);
-                movieGridAdapter.updateData(movieList);
-                favMenuButtonClick=false;
+        if (cursor != null) {
+            adapter.swapCursor(cursor);
+            getContentResolver().notifyChange(MovieColumns.CONTENT_URI, null, true);
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
-
 }

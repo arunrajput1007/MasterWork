@@ -6,7 +6,12 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/tablet_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--<LinearLayout
         android:id="@+id/tablet_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,12 +28,12 @@
             style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
+            android:gravity="center_vertical"
             android:paddingLeft="16dp"
-            android:gravity="center_vertical" />
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
 
-    </LinearLayout>
+    </LinearLayout>-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +43,8 @@
         <ImageView
             android:id="@+id/poster_image"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:padding="@dimen/all_margin" />
 
         <LinearLayout
@@ -69,68 +75,73 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/synopsis"
-        style="@style/TextAppearance.AppCompat.Small"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/detail_dynamic_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:textColor="#616161"
-        android:textSize="16sp" />
+        android:layout_height="900dp"></android.support.v7.widget.RecyclerView>
 
-    <View
-        android:background="@android:color/black"
-        android:layout_width="match_parent"
-        android:layout_margin="16dp"
-        android:layout_height="2dp"/>
+    <!--    <TextView
+            android:id="@+id/synopsis"
+            style="@style/TextAppearance.AppCompat.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="#616161"
+            android:textSize="16sp" />-->
 
-    <TextView
-        style="@style/TextAppearance.AppCompat.Title"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/trailer"/>
+    <!--    <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_margin="16dp"
+            android:background="@android:color/black" />
 
-    <LinearLayout
-        android:id="@+id/trailer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="24dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp">
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/trailer" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/trailer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="24dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
 
-    <View
-        android:background="@android:color/black"
-        android:layout_width="match_parent"
-        android:layout_margin="16dp"
-        android:layout_height="2dp"/>
+        </LinearLayout>
 
-    <TextView
-        style="@style/TextAppearance.AppCompat.Title"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/review"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_margin="16dp"
+            android:background="@android:color/black" />
 
-    <LinearLayout
-        android:id="@+id/review_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="24dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp">
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/review" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/review_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp"
+            android:paddingEnd="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="16dp"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp">
+
+        </LinearLayout>-->
 
 </LinearLayout>
 

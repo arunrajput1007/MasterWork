@@ -156,6 +156,46 @@ public class MovieSelection extends AbstractSelection<MovieSelection> {
         return this;
     }
 
+    public MovieSelection category(String... value) {
+        addEquals(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+    public MovieSelection categoryNot(String... value) {
+        addNotEquals(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+    public MovieSelection categoryLike(String... value) {
+        addLike(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+    public MovieSelection categoryContains(String... value) {
+        addContains(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+    public MovieSelection categoryStartsWith(String... value) {
+        addStartsWith(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+    public MovieSelection categoryEndsWith(String... value) {
+        addEndsWith(MovieColumns.CATEGORY, value);
+        return this;
+    }
+
+    public MovieSelection orderByCategory(boolean desc) {
+        orderBy(MovieColumns.CATEGORY, desc);
+        return this;
+    }
+
+    public MovieSelection orderByCategory() {
+        orderBy(MovieColumns.CATEGORY, false);
+        return this;
+    }
+
     public MovieSelection posterPathUrl(String... value) {
         addEquals(MovieColumns.POSTER_PATH_URL, value);
         return this;
@@ -528,46 +568,6 @@ public class MovieSelection extends AbstractSelection<MovieSelection> {
 
     public MovieSelection orderByBackdropPathLocal() {
         orderBy(MovieColumns.BACKDROP_PATH_LOCAL, false);
-        return this;
-    }
-
-    public MovieSelection category(String... value) {
-        addEquals(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
-    public MovieSelection categoryNot(String... value) {
-        addNotEquals(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
-    public MovieSelection categoryLike(String... value) {
-        addLike(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
-    public MovieSelection categoryContains(String... value) {
-        addContains(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
-    public MovieSelection categoryStartsWith(String... value) {
-        addStartsWith(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
-    public MovieSelection categoryEndsWith(String... value) {
-        addEndsWith(MovieColumns.CATEGORY, value);
-        return this;
-    }
-
-    public MovieSelection orderByCategory(boolean desc) {
-        orderBy(MovieColumns.CATEGORY, desc);
-        return this;
-    }
-
-    public MovieSelection orderByCategory() {
-        orderBy(MovieColumns.CATEGORY, false);
         return this;
     }
 }

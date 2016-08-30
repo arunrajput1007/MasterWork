@@ -4,18 +4,18 @@
     tools:context=".activity.MainActivity">
     <item
         android:id="@+id/menu_item_share"
-        app:showAsAction="ifRoom"
         android:icon="@android:drawable/ic_menu_share"
-        android:title="Share" />
+        android:title="Share"
+        app:showAsAction="ifRoom" />
     <item
         android:title="@string/sort_by"
         app:showAsAction="never" />
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu_pop_movies"
+            android:checked="true"
             android:title="@string/popularity"
-            app:showAsAction="never"
-            android:checked="true"/>
+            app:showAsAction="never" />
 
         <item
             android:id="@+id/menu_top_rated_movies"
@@ -25,7 +25,6 @@
         <item
             android:id="@+id/menu_favorites"
             android:title="@string/my_favorites"
-            app:showAsAction="never"
-            />
+            app:showAsAction="never" />
     </group>
 </menu>

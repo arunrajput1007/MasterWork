@@ -24,11 +24,11 @@ public class PaletteImageViewLoader extends AsyncTask<String, Void, Bitmap> {
     private TextView titleLabel = null;
     private AppCompatActivity activity = null;
 
-    public PaletteImageViewLoader(Context mContext,ImageView backImage,TextView titleLabel) {
+    public PaletteImageViewLoader(Context mContext, ImageView backImage, TextView titleLabel) {
         this.mContext = mContext;
         this.backImage = backImage;
         this.titleLabel = titleLabel;
-        this.activity = (AppCompatActivity)mContext;
+        this.activity = (AppCompatActivity) mContext;
     }
 
     @Override
